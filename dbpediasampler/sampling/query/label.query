@@ -1,4 +1,4 @@
 MATCH (x:DBI)
-WHERE x.uri = ?
+WHERE x.uri = $uri
 RETURN x.`http://www.w3.org/2000/01/rdf-schema#label` as label,
   x.`http://www.w3.org/2000/01/rdf-schema#comment` as description

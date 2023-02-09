@@ -1,4 +1,5 @@
 from os.path import join, dirname
+from typing import Tuple
 
 from neo4j import Session
 
@@ -19,14 +20,23 @@ class Sampler:
         self._data_dir = data_dir
         self._session = session
         self._label_query = None
+        self._stmt_query = None
 
     @property
-    def statement_query(self):
+    def label_query(self):
         if self._label_query is None:
-            with open(join(dirname(__file__), 'query', 'statements.query')) \
+            with open(join(dirname(__file__), 'query', 'label.query')) \
                     as query_f:
                 self._label_query = query_f.read()
         return self._label_query
+
+    @property
+    def statement_query(self):
+        if self._stmt_query is None:
+            with open(join(dirname(__file__), 'query', 'statements.query')) \
+                    as query_f:
+                self._stmt_query = query_f.read()
+        return self._stmt_query
 
     def run(self):
         """runs the sampler."""
@@ -37,8 +47,21 @@ class Sampler:
                                                            'statements.nt.gz'),
                                        join(self._data_dir, 'statements.tsv.gz')
                                        ) as stmt_writer:
+                lw = index_manager.label_writer
                 for stmt in self.fetch_statements():
                     stmt_writer.add_statement(stmt)
+                    for ent in [stmt[0], stmt[2]]:
+                        label, desc = self.fetch_label(ent)
+                        lw.write_label(ent, label, desc)
+
+    def fetch_label(self, uri: str) -> Tuple[str, str]:
+        """fetches label for the given entity.
+
+        :param uri: URI of the entity for which the label shall be fetched.
+        """
+        result = self._session.run(self.label_query, uri=uri)
+        record = result.single()
+        return record['label'], record['description']
 
     def fetch_statements(self):
         """fetches the statements that should be included in the subsampled KG.

@@ -44,7 +44,7 @@ class LabelWriter:
         if i is None:
             raise ValueError('entity "%s" wasn\'t indexed')
         if i not in self._labelled_set:
-            self._tsv_writer.write([i, label, description])
+            self._tsv_writer.writerow([i, label, description])
             self._labelled_set.add(i)
 
 
