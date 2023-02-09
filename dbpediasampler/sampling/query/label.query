@@ -1,4 +1,7 @@
 MATCH (x:DBI)
 WHERE x.uri = $uri
+OPTIONAL MATCH (x) -[:`http://dbpedia.org/ontology/thumbnail`]-> (p:Resource)
 RETURN x.`http://www.w3.org/2000/01/rdf-schema#label` as label,
-  x.`http://www.w3.org/2000/01/rdf-schema#comment` as description
+  x.`http://www.w3.org/2000/01/rdf-schema#comment` as description,
+  p.uri as depiction
+LIMIT 1

@@ -32,19 +32,22 @@ class LabelWriter:
             raise ValueError('entity "%s" wasn\'t indexed')
         return i in self._labelled_set
 
-    def write_label(self, uri: str, label: str, description: str) -> None:
+    def write_label(self, uri: str, label: str, description: str,
+                    thumbnail_url: str) -> None:
         """writes the label and description to a file for a given entity.
 
         :param uri: uri of the entity for which the label shall be written.
         :param label: label that shall be written for the given entity.
         :param description: description that shall be written for the given
         entity.
+        :param thumbnail_url: URL of the thumbnail picture that shall be written
+        for the given entity.
         """
         i = self._index_mng.get_index(uri)
         if i is None:
             raise ValueError('entity "%s" wasn\'t indexed')
         if i not in self._labelled_set:
-            self._tsv_writer.writerow([i, label, description])
+            self._tsv_writer.writerow([i, label, description, thumbnail_url])
             self._labelled_set.add(i)
 
 

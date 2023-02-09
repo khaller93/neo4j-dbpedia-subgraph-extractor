@@ -51,17 +51,17 @@ class Sampler:
                 for stmt in self.fetch_statements():
                     stmt_writer.add_statement(stmt)
                     for ent in [stmt[0], stmt[2]]:
-                        label, desc = self.fetch_label(ent)
-                        lw.write_label(ent, label, desc)
+                        label, desc, thumb = self.fetch_label(ent)
+                        lw.write_label(ent, label, desc, thumb)
 
-    def fetch_label(self, uri: str) -> Tuple[str, str]:
+    def fetch_label(self, uri: str) -> Tuple[str, str, str]:
         """fetches label for the given entity.
 
         :param uri: URI of the entity for which the label shall be fetched.
         """
         result = self._session.run(self.label_query, uri=uri)
         record = result.single()
-        return record['label'], record['description']
+        return record['label'], record['description'], record['depiction']
 
     def fetch_statements(self):
         """fetches the statements that should be included in the subsampled KG.
