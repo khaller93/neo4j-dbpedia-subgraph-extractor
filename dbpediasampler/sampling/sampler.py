@@ -1,3 +1,4 @@
+import logging
 from os.path import join, dirname
 from typing import Tuple
 
@@ -48,11 +49,16 @@ class Sampler:
                                        join(self._data_dir, 'statements.tsv.gz')
                                        ) as stmt_writer:
                 lw = index_manager.label_writer
+                n = 0
                 for stmt in self.fetch_statements():
                     stmt_writer.add_statement(stmt)
                     for ent in [stmt[0], stmt[2]]:
                         label, desc, thumb = self.fetch_label(ent)
                         lw.write_label(ent, label, desc, thumb)
+                    n += 1
+                    if n % 100000:
+                        logging.info('Loaded %s statements.' % n)
+                logging.info('Successfully loaded %s statements.' % n)
 
     def fetch_label(self, uri: str) -> Tuple[str, str, str]:
         """fetches label for the given entity.

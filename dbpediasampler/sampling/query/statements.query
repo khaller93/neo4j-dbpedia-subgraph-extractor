@@ -1,3 +1,2 @@
 MATCH (x:DB1M) -[p]-> (y:DB1M)
-WHERE id(x) < 1000
 RETURN x.uri as subj, type(p) as pred, y.uri as obj
