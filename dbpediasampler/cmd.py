@@ -4,7 +4,7 @@ from os.path import join, exists
 from typer import Typer
 from neo4j import GraphDatabase
 
-from dbpediasampler.sampling.sampler import Sampler
+from dbpediasampler.sampling.sampler import DB1MSampler, DB500kSampler
 
 app = Typer()
 
@@ -39,7 +39,34 @@ def run_dbpedia1m(data_dir: str = _default_data_dir_path('dbpedia1m'),
         with driver.session(database='neo4j') as session:
             if not exists(data_dir):
                 makedirs(data_dir)
-            sampler = Sampler(data_dir, session)
+            sampler = DB1MSampler(data_dir, session)
+            sampler.run()
+    finally:
+        driver.close()
+
+
+@app.command(name='dbpedia500k', help='using dbpedia500k methodology to sample '
+                                      'DBpedia KG')
+def run_dbpedia1m(data_dir: str = _default_data_dir_path('dbpedia500k'),
+                  host: str = getenv('NEO4J_HOSTNAME', default='localhost'),
+                  port: int = getenv('NEO4J_BOLT_PORT', default=7687),
+                  username: str = getenv('NEO4J_USERNAME', default='neo4j'),
+                  password: str = getenv('NEO4J_PASSWORD', default='neo4j')):
+    """runs the DBpedia500k sampling methodology.
+
+    :param data_dir: path to the data directory. where results will be stored.
+    :param host: of the Neo4J instance maintaining the DBpedia KG.
+    :param port: bolt port of the Neo4J instance maintaining the DBpedia KG.
+    :param username: username of the Neo4J instance maintaining the DBpedia KG.
+    :param password: password of the Neo4J instance maintaining the DBpedia KG.
+    """
+    driver = GraphDatabase.driver('neo4j://%s:%d' % (host, port),
+                                  auth=(username, password))
+    try:
+        with driver.session(database='neo4j') as session:
+            if not exists(data_dir):
+                makedirs(data_dir)
+            sampler = DB500kSampler(data_dir, session)
             sampler.run()
     finally:
         driver.close()

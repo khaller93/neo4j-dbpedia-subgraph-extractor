@@ -1,4 +1,5 @@
 import logging
+from abc import ABC, abstractmethod
 from os.path import join, dirname
 from typing import Tuple
 
@@ -7,7 +8,7 @@ from neo4j import Session
 from dbpediasampler.sampling.io import open_index_manager, open_statement_writer
 
 
-class Sampler:
+class Sampler(ABC):
     """A sampler for subsampling DBpedia knowledge graph. It uses the specified
     session to a Neo4J instance to query the KG for subsampling."""
 
@@ -21,23 +22,19 @@ class Sampler:
         self._data_dir = data_dir
         self._session = session
         self._label_query = None
-        self._stmt_query = None
 
-    @property
     def label_query(self):
+        """gets the query for fetching labels for sampled entities."""
         if self._label_query is None:
             with open(join(dirname(__file__), 'query', 'label.query')) \
                     as query_f:
                 self._label_query = query_f.read()
         return self._label_query
 
-    @property
-    def statement_query(self):
-        if self._stmt_query is None:
-            with open(join(dirname(__file__), 'query', 'statements.query')) \
-                    as query_f:
-                self._stmt_query = query_f.read()
-        return self._stmt_query
+    @abstractmethod
+    def statement_query(self) -> str:
+        """gets the query for fetching sampled statements."""
+        raise NotImplementedError('must be implemented')
 
     def run(self):
         """runs the sampler."""
@@ -66,7 +63,7 @@ class Sampler:
 
         :param uri: URI of the entity for which the label shall be fetched.
         """
-        result = self._session.run(self.label_query, uri=uri)
+        result = self._session.run(self.label_query(), uri=uri)
         record = result.single()
         return record['label'], record['description'], record['depiction']
 
@@ -75,6 +72,34 @@ class Sampler:
 
         :return: an iterator over the statements.
         """
-        result = self._session.run(self.statement_query)
+        result = self._session.run(self.statement_query())
         for record in result:
             yield record['subj'], record['pred'], record['obj']
+
+
+class DB1MSampler(Sampler):
+
+    def __init__(self, data_dir: str, session: Session):
+        super().__init__(data_dir, session)
+        self._stmt_query = None
+
+    def statement_query(self):
+        if self._stmt_query is None:
+            with open(join(dirname(__file__), 'query',
+                           'dbpedia1m_statements.query')) as query_f:
+                self._stmt_query = query_f.read()
+        return self._stmt_query
+
+
+class DB500kSampler(Sampler):
+
+    def __init__(self, data_dir: str, session: Session):
+        super().__init__(data_dir, session)
+        self._stmt_query = None
+
+    def statement_query(self):
+        if self._stmt_query is None:
+            with open(join(dirname(__file__), 'query',
+                           'dbpedia500k_statements.query')) as query_f:
+                self._stmt_query = query_f.read()
+        return self._stmt_query

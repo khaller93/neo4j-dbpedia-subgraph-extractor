@@ -1,0 +1,2 @@
+MATCH (x:DB500k) -[p]-> (y:DB500k)
+RETURN x.uri as subj, type(p) as pred, y.uri as obj
