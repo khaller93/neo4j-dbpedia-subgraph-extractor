@@ -36,7 +36,7 @@ def run_sampling(clazz, data_dir: str, host: str, port: int, username: str,
         with driver.session(database='neo4j') as session:
             if not exists(data_dir):
                 makedirs(data_dir)
-            sampler = clazz.__new__(data_dir, session)
+            sampler = clazz(data_dir, session)
             sampler.run()
     finally:
         driver.close()
