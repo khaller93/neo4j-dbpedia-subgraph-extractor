@@ -80,7 +80,7 @@ class IndexManager:
         """
         if uri not in self._entity_map:
             if relevant:
-                self._rev_entities_w.writerow([self._last_index])
+                self._rev_entities_w.writerow([uri])
             self._index_w.writerow([self._last_index, uri])
             self._entity_map[uri] = self._last_index
             self._last_index += 1
