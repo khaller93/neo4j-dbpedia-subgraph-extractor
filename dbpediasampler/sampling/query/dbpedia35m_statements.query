@@ -1,2 +1,4 @@
 MATCH (x:DBI) -[p]-> (y:DBI)
 RETURN x.uri as subj, type(p) as pred, y.uri as obj
+SKIP $skip
+LIMIT $limit

@@ -7,6 +7,8 @@ from neo4j import Session
 
 from dbpediasampler.sampling.io import open_index_manager, open_statement_writer
 
+LOAD_LIMIT = 50000
+
 
 class Sampler(ABC):
     """A sampler for subsampling DBpedia knowledge graph. It uses the specified
@@ -54,7 +56,7 @@ class Sampler(ABC):
                             label, desc, thumb = self.fetch_label(ent)
                             lw.write_label(ent, label, desc, thumb)
                     n += 1
-                    if n % 100000 == 0:
+                    if n % LOAD_LIMIT == 0:
                         logging.info('Loaded %s statements.' % n)
                 logging.info('Successfully loaded %s statements.' % n)
 
@@ -72,9 +74,15 @@ class Sampler(ABC):
 
         :return: an iterator over the statements.
         """
-        result = self._session.run(self.statement_query())
-        for record in result:
-            yield record['subj'], record['pred'], record['obj']
+        skip = 0
+        while True:
+            result = self._session.run(self.statement_query(),
+                                       skip=skip, limit=LOAD_LIMIT)
+            if result.peek() is None:
+                break
+            for record in result:
+                yield record['subj'], record['pred'], record['obj']
+            skip += LOAD_LIMIT
 
 
 class DB35MSampler(Sampler):
