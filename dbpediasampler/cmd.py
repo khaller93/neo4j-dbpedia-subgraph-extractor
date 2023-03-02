@@ -5,7 +5,7 @@ from typer import Typer
 from neo4j import GraphDatabase
 
 from dbpediasampler.sampling.sampler import DB35MSampler, DB1MSampler, \
-    DB250kSampler
+    DB250kSampler, DB25kSampler
 
 app = Typer()
 
@@ -70,3 +70,13 @@ def run_dbpedia1m(data_dir: str = _default_data_dir_path('dbpedia250k'),
                   username: str = getenv('NEO4J_USERNAME', default='neo4j'),
                   password: str = getenv('NEO4J_PASSWORD', default='neo4j')):
     run_sampling(DB250kSampler, data_dir, host, port, username, password)
+
+
+@app.command(name='dbpedia25k', help='using dbpedia25k methodology to sample '
+                                      'DBpedia KG')
+def run_dbpedia1m(data_dir: str = _default_data_dir_path('dbpedia25k'),
+                  host: str = getenv('NEO4J_HOSTNAME', default='localhost'),
+                  port: int = getenv('NEO4J_BOLT_PORT', default=7687),
+                  username: str = getenv('NEO4J_USERNAME', default='neo4j'),
+                  password: str = getenv('NEO4J_PASSWORD', default='neo4j')):
+    run_sampling(DB25kSampler, data_dir, host, port, username, password)

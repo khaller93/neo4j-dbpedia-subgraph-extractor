@@ -139,3 +139,17 @@ class DB250kSampler(Sampler):
                            'dbpedia250k_statements.query')) as query_f:
                 self._stmt_query = query_f.read()
         return self._stmt_query
+
+
+class DB25kSampler(Sampler):
+
+    def __init__(self, data_dir: str, session: Session):
+        super().__init__(data_dir, session)
+        self._stmt_query = None
+
+    def statement_query(self):
+        if self._stmt_query is None:
+            with open(join(dirname(__file__), 'query',
+                           'dbpedia25k_statements.query')) as query_f:
+                self._stmt_query = query_f.read()
+        return self._stmt_query
