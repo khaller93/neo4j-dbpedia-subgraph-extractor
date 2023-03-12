@@ -5,7 +5,8 @@ from os.path import join, exists
 from neo4j import GraphDatabase
 from typer import Typer
 
-from extractor import DB1MExtractor, DB35MExtractor, DB250KExtractor
+from extractor import DB1MExtractor, DB35MExtractor, DB250KExtractor, \
+    DBA240Extractor
 
 app = Typer()
 
@@ -13,6 +14,7 @@ extractors = {
     'db35m': DB35MExtractor,
     'db1m': DB1MExtractor,
     'db250k': DB250KExtractor,
+    'dba240': DBA240Extractor,
 }
 
 

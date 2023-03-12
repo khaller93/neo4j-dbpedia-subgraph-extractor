@@ -141,7 +141,7 @@ class DB250KExtractor(Extractor):
         return self._stmt_query
 
 
-class DB25KExtractor(Extractor):
+class DBA240Extractor(Extractor):
 
     def __init__(self, data_dir: str, session: Session):
         super().__init__(data_dir, session)
@@ -150,6 +150,6 @@ class DB25KExtractor(Extractor):
     def statement_query(self):
         if self._stmt_query is None:
             with open(join(dirname(__file__), 'query',
-                           'dbpedia25k_statements.query')) as query_f:
+                           'dbpediaA240_statements.query')) as query_f:
                 self._stmt_query = query_f.read()
         return self._stmt_query
