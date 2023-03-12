@@ -7,7 +7,7 @@ from rdflib.term import URIRef
 
 
 class LabelWriter:
-    """a writer for labels and descriptions of an entity"""
+    """a writer for labels and descriptions of an entity."""
 
     def __init__(self, index_mng: 'IndexManager', tsv_writer):
         """creates a new label writer.

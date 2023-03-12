@@ -5,14 +5,14 @@ from typing import Tuple
 
 from neo4j import Session
 
-from dbpediasampler.sampling.io import open_index_manager, open_statement_writer
+from extractor.io import open_index_manager, open_statement_writer
 
-LOAD_LIMIT = 50000
+LOAD_LIMIT = 1000000
 
 
-class Sampler(ABC):
-    """A sampler for subsampling DBpedia knowledge graph. It uses the specified
-    session to a Neo4J instance to query the KG for subsampling."""
+class Extractor(ABC):
+    """An extractor for subgraphs from DBpedia knowledge graphs. It uses the
+    specified session to a Neo4J instance to query the KG for subsampling."""
 
     def __init__(self, data_dir: str, session: Session):
         """creates a new sampler.
@@ -39,7 +39,7 @@ class Sampler(ABC):
         raise NotImplementedError('must be implemented')
 
     def run(self):
-        """runs the sampler."""
+        """runs the extractor."""
         with open_index_manager(join(self._data_dir, 'index.tsv.gz'),
                                 join(self._data_dir, 'relevant_entities.tsv.gz')
                                 ) as index_manager:
@@ -85,7 +85,7 @@ class Sampler(ABC):
             skip += LOAD_LIMIT
 
 
-class DB35MSampler(Sampler):
+class DB35MExtractor(Extractor):
 
     def __init__(self, data_dir: str, session: Session):
         super().__init__(data_dir, session)
@@ -99,7 +99,7 @@ class DB35MSampler(Sampler):
         return self._stmt_query
 
 
-class DB1MSampler(Sampler):
+class DB1MExtractor(Extractor):
 
     def __init__(self, data_dir: str, session: Session):
         super().__init__(data_dir, session)
@@ -113,7 +113,7 @@ class DB1MSampler(Sampler):
         return self._stmt_query
 
 
-class DB500kSampler(Sampler):
+class DB500KExtractor(Extractor):
 
     def __init__(self, data_dir: str, session: Session):
         super().__init__(data_dir, session)
@@ -127,7 +127,7 @@ class DB500kSampler(Sampler):
         return self._stmt_query
 
 
-class DB250kSampler(Sampler):
+class DB250KExtractor(Extractor):
 
     def __init__(self, data_dir: str, session: Session):
         super().__init__(data_dir, session)
@@ -141,7 +141,7 @@ class DB250kSampler(Sampler):
         return self._stmt_query
 
 
-class DB25kSampler(Sampler):
+class DB25KExtractor(Extractor):
 
     def __init__(self, data_dir: str, session: Session):
         super().__init__(data_dir, session)
